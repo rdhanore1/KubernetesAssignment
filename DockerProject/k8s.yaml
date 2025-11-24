@@ -1,4 +1,4 @@
-# k8s.yaml - Deploy frontend and backend
+# k8s.yaml - combined resources for frontend (node) + backend (python) + ingress
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -20,36 +20,39 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: backend:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 3000
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 3
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 15
-          periodSeconds: 20
+        - name: backend
+          image: backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-svc
+  name: backend-service
   namespace: demo-app
 spec:
   selector:
     app: backend
   ports:
-  - port: 3000
-    targetPort: 3000
-    protocol: TCP
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -68,37 +71,58 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: frontend:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 5000
-        env:
-        - name: BACKEND_URL
-          value: "http://backend-svc:3000"   # service DNS for backend
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 5000
-          initialDelaySeconds: 3
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 5000
-          initialDelaySeconds: 15
-          periodSeconds: 20
+        - name: frontend
+          image: frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: BACKEND_URL
+              value: "http://backend-service:3000"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-svc
+  name: frontend-service
   namespace: demo-app
 spec:
   selector:
     app: frontend
   ports:
-  - port: 80
-    targetPort: 5000
-    protocol: TCP
-  type: NodePort
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: project-ingress
+  namespace: demo-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dockerproject.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
