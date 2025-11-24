@@ -1,0 +1,7 @@
+REPOSITORY                   TAG       IMAGE ID       SIZE
+dockerproject-backend        latest    07c2812e9838   209MB
+dockerproject-frontend       latest    31327328d315   203MB
+actionsdemo-selenium-tests   latest    bfb8ff1fb63e   770MB
+actionsdemo                  latest    8bddea9246f4   2.37GB
+selenium/node-chrome         4.15.0    54c4e319d8e4   2.08GB
+selenium/hub                 4.15.0    981b7194f472   696MB

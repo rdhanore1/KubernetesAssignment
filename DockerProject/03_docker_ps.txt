@@ -1,0 +1,2 @@
+NAMES                      IMAGE                    PORTS
+dockerproject-frontend-1   dockerproject-frontend   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp

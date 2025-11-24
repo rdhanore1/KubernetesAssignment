@@ -1,0 +1,4 @@
+backend-1  |   File "/app/app.py", line 13
+backend-1  |     if request.is_json:
+backend-1  |     ^
+backend-1  | IndentationError: expected an indented block after function definition on line 10

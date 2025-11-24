@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Form to Flask Backend</title>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; padding: 2rem; }
+form { max-width: 480px; margin: 0 auto; }
+label { display:block; margin-top: 1rem; }
+input, textarea { width: 100%; padding: 0.5rem; }
+button { margin-top: 1rem; padding: 0.6rem 1rem; }
+.result { margin-top: 1rem; }
+</style>
+</head>
+<body>
+<h1>Contact / Demo Form</h1>
+
+<form id="demo-form">
+<label>
+Name
+<input type="text" name="name" required />
+</label>
+
+<label>
+Email
+<input type="email" name="email" required />
+</label>
+
+<label>
+Message
+<textarea name="message" rows="5" required></textarea>
+</label>
+
+<button type="submit">Send</button>
+</form>
+
+<div class="result" id="result"></div>
+
+<script>
+const form = document.getElementById('demo-form');
+const resultEl = document.getElementById('result');
+
+form.addEventListener('submit', async (e) => {
+e.preventDefault();
+resultEl.textContent = 'Sending...';
+
+const formData = new FormData(form);
+const payload = {};
+for (const [k, v] of formData.entries()) payload[k] = v;
+
+try {
+const resp = await fetch('/api/submit', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(payload)
+});
+
+const data = await resp.json();
+
+
+if (!resp.ok) throw data;
+
+
+resultEl.textContent = 'Success — backend response: ' + JSON.stringify(data);
+} catch (err) {
+console.error(err);
+resultEl.textContent = 'Error: ' + (err && err.error ? err.error : JSON.stringify(err));
+}
+});
+</script>
+</body>
+</html>

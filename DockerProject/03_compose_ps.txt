@@ -1,0 +1,2 @@
+NAME                       IMAGE                    COMMAND                  SERVICE    CREATED         STATUS         PORTS
+dockerproject-frontend-1   dockerproject-frontend   "docker-entrypoint.s…"   frontend   7 seconds ago   Up 5 seconds   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp

@@ -1,0 +1,2 @@
+frontend-1  | Frontend server running on port 3000
+frontend-1  | Error forwarding to backend: getaddrinfo ENOTFOUND backend
