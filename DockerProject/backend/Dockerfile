@@ -1,7 +1,15 @@
-FROM python:3.10-slim
+FROM node:18-alpine
+
 WORKDIR /app
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+
+COPY package*.json ./
+
+RUN npm ci --production
+
 COPY . .
-EXPOSE 5000
-CMD ["python", "app.py"]
+
+ENV PORT=3000
+
+EXPOSE 3000
+
+CMD ["node", "index.js"]
